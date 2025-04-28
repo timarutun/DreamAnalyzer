@@ -5,13 +5,6 @@
 //  Created by Timur on 4/27/25.
 //
 
-//
-//  AddDreamView.swift
-//  DreamAnalyzer
-//
-//  Created by Timur on 4/25/25.
-//
-
 import SwiftUI
 import SwiftData
 

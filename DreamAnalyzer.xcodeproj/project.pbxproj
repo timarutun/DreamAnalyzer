@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		39A717E82DBF40DE001DF25D /* OpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = 39A717E72DBF40DE001DF25D /* OpenAI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		39D4905A2DBC88EC00257A51 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39A717E82DBF40DE001DF25D /* OpenAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = DreamAnalyzer;
 			packageProductDependencies = (
+				39A717E72DBF40DE001DF25D /* OpenAI */,
 			);
 			productName = DreamAnalyzer;
 			productReference = 39D4904A2DBC88E900257A51 /* DreamAnalyzer.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 39D490412DBC88E900257A51;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				39A717E62DBF40DE001DF25D /* XCRemoteSwiftPackageReference "OpenAI" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 39D4904B2DBC88E900257A51 /* Products */;
 			projectDirPath = "";
@@ -550,6 +559,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		39A717E62DBF40DE001DF25D /* XCRemoteSwiftPackageReference "OpenAI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MacPaw/OpenAI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		39A717E72DBF40DE001DF25D /* OpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 39A717E62DBF40DE001DF25D /* XCRemoteSwiftPackageReference "OpenAI" */;
+			productName = OpenAI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 39D490422DBC88E900257A51 /* Project object */;
 }
