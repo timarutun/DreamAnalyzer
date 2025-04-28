@@ -12,7 +12,7 @@ import SwiftData
 struct DreamAnalyzerApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Dream.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct DreamAnalyzerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DreamListView()
         }
         .modelContainer(sharedModelContainer)
     }
