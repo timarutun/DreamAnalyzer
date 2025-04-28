@@ -11,12 +11,23 @@ struct DreamRowView: View {
     let dream: Dream
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(dream.text.prefix(50) + "...") // Truncated preview
-                .font(.headline)
-            Text(dream.date, format: .dateTime.day().month().year())
-                .font(.caption)
-                .foregroundStyle(.gray)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(dream.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.caption2)
+                    .foregroundStyle(.blue)
+                
+                Spacer()
+                
+                if dream.analysis != nil {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(.yellow)
+                }
+            }
+            
+            Text(dream.text.prefix(60) + (dream.text.count > 60 ? "..." : ""))
+                .font(.subheadline)
+                .lineLimit(2)
         }
         .padding(.vertical, 8)
     }
