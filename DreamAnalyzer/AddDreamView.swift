@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import OpenAI
 
 struct AddDreamView: View {
     // MARK: - Properties
@@ -18,34 +19,34 @@ struct AddDreamView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     
+    private let openAI = OpenAI(apiToken: "REDACTED")
+    
     // MARK: - Body
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Dream Details")) {
+                Section(header: Text("Dream Details").font(.headline)) {
                     TextEditor(text: $dreamText)
                         .frame(minHeight: 200)
-                        .overlay(
-                            dreamText.isEmpty ?
-                            Text("Describe your dream here...")
-                                .foregroundColor(.gray)
-                                .padding(.leading, 5)
-                                .padding(.top, 8)
-                                .allowsHitTesting(false)
-                            : nil,
-                            alignment: .topLeading
-                        )
+                        .overlay(alignment: .topLeading) {
+                            if dreamText.isEmpty {
+                                Text("Describe your dream here...")
+                                    .foregroundColor(.gray.opacity(0.5))
+                                    .padding(.top, 8)
+                                    .padding(.leading, 5)
+                            }
+                        }
                 }
                 
                 Section {
-                    Button(action: saveDream) {
+                    Button(action: saveAndAnalyzeDream) {
                         HStack {
                             Spacer()
                             if isAnalyzing {
                                 ProgressView()
-                                    .padding(.trailing, 5)
+                                    .padding(.trailing, 8)
                             }
-                            Text(isAnalyzing ? "Analyzing..." : "Save Dream")
+                            Text(isAnalyzing ? "Analyzing..." : "Save & Analyze")
                             Spacer()
                         }
                     }
@@ -70,37 +71,57 @@ struct AddDreamView: View {
     }
     
     // MARK: - Methods
-    private func saveDream() {
+    private func saveAndAnalyzeDream() {
         guard !dreamText.isEmpty else { return }
         
         isAnalyzing = true
         
-        // ChatGPT API here
-        // Simulating analysis after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            let analysis = generateMockAnalysis(for: dreamText)
-            let newDream = Dream(
-                text: dreamText,
-                date: Date(),
-                analysis: analysis
-            )
-            
-            modelContext.insert(newDream)
-            isAnalyzing = false
-            dismiss()
+        Task {
+            do {
+                let analysis = try await analyzeWithChatGPT(dreamText)
+                
+                await MainActor.run {
+                    let newDream = Dream(
+                        text: dreamText,
+                        date: Date(),
+                        analysis: analysis
+                    )
+                    
+                    modelContext.insert(newDream)
+                    isAnalyzing = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    alertMessage = error.localizedDescription
+                    showAlert = true
+                    isAnalyzing = false
+                }
+            }
         }
     }
     
-    private func generateMockAnalysis(for dream: String) -> String {
-        let mockAnalyses = [
-            "This dream suggests you're processing recent life changes. The symbols indicate transformation.",
-            "Your subconscious seems to be working through unresolved conflicts. Pay attention to recurring themes.",
-            "The imagery in this dream typically represents creative energy seeking expression.",
-            "This appears to be an anxiety dream, possibly related to upcoming challenges.",
-            "Your dream shows positive symbols suggesting personal growth and new opportunities."
-        ]
+    private func analyzeWithChatGPT(_ dream: String) async throws -> String {
+        let systemMessage = ChatQuery.ChatCompletionMessageParam(
+            role: .system,
+            content: """
+            You're a dream interpretation expert. Analyze the dream in 2-3 sentences.
+            Use psychological symbolism. Respond in language of dream.
+            """
+        )!
         
-        return mockAnalyses.randomElement() ?? "Dream analysis unavailable"
+        let userMessage = ChatQuery.ChatCompletionMessageParam(
+            role: .user,
+            content: dream
+        )!
+        
+        let query = ChatQuery(
+            messages: [systemMessage, userMessage],
+            model: .gpt3_5Turbo
+        )
+        
+        let result = try await openAI.chats(query: query)
+        return result.choices.first?.message.content ?? "Analysis error"
     }
 }
 
